@@ -89,6 +89,8 @@ header:hover .giant .rest { animation: none; opacity: 1; }
 .hero-img { margin: 0; }
 .hero-img img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--card); }
 body.dark .hero-img img { filter: invert(.933); }
+.hero-svg svg { display: block; width: 100%; height: auto; }
+.hero-svg .wk, .hero-svg .rail { transition: fill .35s; }
 .hero-img figcaption { display: none; justify-content: space-between; gap: 12px; padding-top: 8px; }
 .hero-img.vacia img { visibility: hidden; }
 .hero-img.vacia { background: var(--card); aspect-ratio: 4 / 3; position: relative; }

@@ -40,8 +40,14 @@
     });
   }
   function getJSON(url) { return fetch(url + '?v=' + Date.now(), { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }); }
-  var YT = '', CANAL = '';
+  var YT = '', CANAL = '', HERO_SVG = '';
   function load() {
+    // Portada animada (SVG): se inserta dentro de la página para usar la tipografía y el modo oscuro
+    fetch('img/teclado.svg').then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {
+      if (t.indexOf('<svg') < 0) return;
+      HERO_SVG = t.slice(t.indexOf('<svg'));
+      var f = app.querySelector('.hero-img'); if (f && !f.classList.contains('hero-svg')) { f.className = 'hero-img hero-svg'; f.innerHTML = HERO_SVG; }
+    }).catch(function () {});
     Promise.all([getJSON('data/canciones.json'), getJSON('data/config.json').catch(function () { return {}; })])
       .then(function (r) { DATA = prepare(r[0]); CFG = r[1] || {}; })
       .catch(function () { LOAD_ERR = true; })
@@ -175,8 +181,9 @@
     var h = '';
 
     h += '<section class="intro">' +
+      (HERO_SVG ? '<figure class="hero-img hero-svg">' + HERO_SVG + '</figure>' :
       '<figure class="hero-img"><img src="img/portada.jpg" alt="Teclado de piano curvo con el título Cifrados de Alabanza y el Salmo 33:3: Cantadle cántico nuevo; hacedlo bien, tañendo con júbilo." onerror="this.parentNode.classList.add(\'vacia\')">' +
-      '<figcaption class="small"><span>Imagen de portada</span><span class="muted">img/portada.jpg</span></figcaption></figure>' +
+      '<figcaption class="small"><span>Imagen de portada</span><span class="muted">img/portada.jpg</span></figcaption></figure>') +
       '<div style="max-width:680px"><h1 class="lead">Acordes y partituras de canciones cristianas para pianistas que están empezando. Cada canción con su tonalidad, sus acordes y un video guía.</h1>' +
       '<p class="muted" style="margin:22px 0 0;max-width:470px">Escribo los arreglos que tocamos en el ministerio, pensados para piano y fáciles de seguir. Busca por canción o por cantante, revisa los acordes, descarga el PDF y practica con el video en YouTube.</p>' +
       '<div class="btns" style="margin-top:30px"><a class="btn btn-solid" href="#buscar" data-act="scroll">Buscar un cifrado ↓</a>' +
