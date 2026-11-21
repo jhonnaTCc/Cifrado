@@ -154,7 +154,7 @@
                     : 'Prueba: ' + F.slice(0, 3).map(function (f) { return esc(f.name); }).join(', ');
     var h = '';
 
-    h += '<section class="intro" style="padding:70px 0 100px">' +
+    h += '<section class="intro">' +
       '<figure class="hero-img"><img src="img/portada.jpg" alt="Teclado de piano curvo con el título Cifrados de Alabanza y el Salmo 33:3: Cantadle cántico nuevo; hacedlo bien, tañendo con júbilo." onerror="this.parentNode.classList.add(\'vacia\')">' +
       '<figcaption class="small"><span>Imagen de portada</span><span class="muted">img/portada.jpg</span></figcaption></figure>' +
       '<div style="max-width:680px"><h1 class="lead">Acordes y partituras de canciones cristianas para pianistas que están empezando. Cada canción con su tonalidad, sus acordes y un video guía.</h1>' +
@@ -172,9 +172,9 @@
     // Galería de carpetas
     var act = shownF.filter(function (f) { return f.name === S.activa; })[0] || shownF[0];
     var ai = act ? shownF.indexOf(act) : -1;
-    h += '<section aria-label="Cantantes y agrupaciones" style="margin-top:110px">' +
+    h += '<section class="sec gal" aria-label="Cantantes y agrupaciones">' +
       '<div class="between rule small"><div><div>Carpetas</div><div class="muted">Cantantes y agrupaciones</div></div>' +
-      '<div style="text-align:right"><div>' + plural(shownF.length, 'carpeta', 'carpetas') + '</div><div class="muted">Pasa el cursor y abre una</div></div></div>' +
+      '<div style="text-align:right"><div>' + plural(shownF.length, 'carpeta', 'carpetas') + '</div><div class="muted hint-desk">Pasa el cursor y abre una</div></div></div>' +
       '<div class="gal-title"><div><div>Cantantes</div><div class="l2"><span class="squares" aria-hidden="true"><i></i><i></i><i></i></span><span>y grupos</span><sup>Nº ' + pad(shownF.length) + '</sup><span class="slash">/.</span></div></div>' +
       '<div class="act"><span id="act-name">' + esc(act ? act.name.toUpperCase() : '') + '</span><sup id="act-pos">' + (act ? (ai + 1) + ' / ' + shownF.length : '') + '</sup></div></div>' +
       '<div class="gal-desc small muted"><div>Cada carpeta reúne los cifrados y partituras de un mismo cantante o grupo.</div><div id="act-desc">' + (act ? plural(act.count, 'canción', 'canciones') + ' · Tonos ' + esc(act.keys) : '') + '</div></div>' +
@@ -187,12 +187,12 @@
         '<a class="arrow" href="' + href + '" tabindex="-1" aria-hidden="true">' + I.arrow + '<span>Ver carpeta</span></a></div>';
     });
     if (!shownF.length) h += '<div class="muted" style="align-self:center">Ninguna carpeta coincide con la búsqueda.</div>';
-    h += '</div></div><div class="ticks r muted"><span id="act-count">' + (act ? act.count : 0) + ' PDF</span><span>' + DATA.length + ' total</span></div></div>' +
-      '<div class="between small" style="margin-top:14px;padding-left:34px"><a id="act-open" href="' + (act ? '#/carpeta/' + encodeURIComponent(act.slug) : '#/') + '">Abrir ' + esc(act ? act.name : '') + ' →</a><span class="muted">Arreglos del ministerio de alabanza</span></div></section>';
+    h += '</div></div><div class="swipe-hint small muted" aria-hidden="true">Desliza para ver todas →</div><div class="ticks r muted"><span id="act-count">' + (act ? act.count : 0) + ' PDF</span><span>' + DATA.length + ' total</span></div></div>' +
+      '<div class="between small gal-foot"><a id="act-open" href="' + (act ? '#/carpeta/' + encodeURIComponent(act.slug) : '#/') + '">Abrir ' + esc(act ? act.name : '') + ' →</a><span class="muted">Arreglos del ministerio de alabanza</span></div></section>';
 
     // Repertorio
-    h += '<section id="canciones" aria-label="Canciones" style="margin-top:110px">' +
-      '<div class="between rule small" style="padding-bottom:28px"><div><div>Repertorio</div><div class="muted">' + grid.length + ' de ' + DATA.length + ' canciones</div></div>' +
+    h += '<section id="canciones" class="sec" aria-label="Canciones">' +
+      '<div class="between rule small rep-head"><div><div>Repertorio</div><div class="muted">' + grid.length + ' de ' + DATA.length + ' canciones</div></div>' +
       '<div class="filters" role="group" aria-label="Filtrar">' + FILTROS.map(function (f) {
         return '<button data-act="filtro" data-v="' + f.id + '" aria-pressed="' + (f.id === cur.id) + '">' + f.label + '<sup>' + qs.filter(f.t).length + '</sup></button>';
       }).join('') + '</div></div>';
@@ -201,17 +201,17 @@
 
     // Cómo usar
     var steps = [['Busca la canción', 'Escribe su nombre o el del cantante, o entra a la carpeta del grupo.'], ['Revisa tono y acordes', 'La ficha muestra la tonalidad, el tempo y los acordes que vas a necesitar en el piano.'], ['Descarga y practica', 'Baja el PDF y toca junto al video guía en piano del canal de YouTube.']];
-    h += '<section class="cols rule small" style="margin-top:150px"><div><div>Cómo usar</div><div class="muted">Tres pasos</div></div>' +
-      steps.map(function (s, i) { return '<div><div class="monof muted" style="font-size:11px">0' + (i + 1) + '</div><div style="font-size:20px;letter-spacing:-0.01em;margin:34px 0 8px">' + s[0] + '</div><div class="muted" style="max-width:260px">' + s[1] + '</div></div>'; }).join('') + '</section>';
+    h += '<section class="cols rule small sec-lg steps"><div><div>Cómo usar</div><div class="muted">Tres pasos</div></div>' +
+      steps.map(function (s, i) { return '<div><div class="monof muted" style="font-size:11px">0' + (i + 1) + '</div><div class="step-t">' + s[0] + '</div><div class="muted" style="max-width:260px">' + s[1] + '</div></div>'; }).join('') + '</section>';
 
     // YouTube
     var recent = DATA.slice().reverse().slice(0, 4);
     h += '<section class="yt" aria-label="Canal de YouTube"><div class="cols small"><div><div>YouTube</div><div class="muted">' + CANAL + '</div></div><div></div>' +
-      '<div class="span2" style="padding-top:80px"><h2 class="lead" style="max-width:640px">Cada canción tiene su video guía en piano. Suscríbete y aprende las nuevas antes del domingo.</h2>' +
+      '<div class="span2 yt-body"><h2 class="lead" style="max-width:640px">Cada canción tiene su video guía en piano. Suscríbete y aprende las nuevas antes del domingo.</h2>' +
       '<p class="muted" style="margin:20px 0 0;max-width:460px;font-size:13px">En cada video muestro los acordes en el teclado, despacio y paso a paso. Al suscribirte y activar la campana te llega el aviso, y el canal crece para llegar a más pianistas.</p>' +
       '<div class="btns" style="margin-top:30px"><a class="btn btn-red" style="min-height:48px;font-size:14px" href="' + YT + '" target="_blank" rel="noopener">' + I.play('#fff') + 'Suscribirse al canal</a>' +
       '<a class="btn btn-line" style="min-height:48px;font-size:14px" href="' + YT + '" target="_blank" rel="noopener">Ver todos los videos ↗</a></div>' +
-      '<div class="muted" style="margin-top:70px;padding-bottom:8px">Videos guía recientes</div>' +
+      '<div class="muted yt-recent">Videos guía recientes</div>' +
       recent.map(function (s) { return '<a class="yt-row" href="#/cancion/' + encodeURIComponent(s.id) + '"><span>' + I.play('currentColor', 9, 11) + esc(s.titulo) + '</span><span class="muted">' + esc(s.artista) + ' · ' + esc(s.tono) + ' →</span></a>'; }).join('') +
       '</div></div></section>';
     return h;
@@ -222,10 +222,10 @@
     var f = folders().filter(function (x) { return x.slug === id; })[0];
     if (!f) return '<section style="padding:120px 0"><h1 class="lead">Esta carpeta no existe.</h1><p><a href="#/">← Volver al inicio</a></p></section>';
     return '<section style="padding-top:22px"><a href="#/" class="small muted" style="display:inline-flex;align-items:center;min-height:44px">← Todas las carpetas</a>' +
-      '<div class="cols" style="padding:70px 0 60px"><div class="small"><div>Carpeta</div><div class="muted">' + plural(f.count, 'canción', 'canciones') + '</div></div><div></div>' +
+      '<div class="cols folder-head"><div class="small"><div>Carpeta</div><div class="muted">' + plural(f.count, 'canción', 'canciones') + '</div></div><div></div>' +
       '<div class="span2"><h1 style="font-size:clamp(40px,5.4vw,96px);line-height:.9;font-weight:500;letter-spacing:-0.045em">' + esc(f.name) + '</h1>' +
       '<div class="small" style="display:flex;flex-wrap:wrap;gap:8px 28px;margin-top:22px"><div><span class="muted">Tonos </span>' + esc(f.keys) + '</div><div><span class="muted">Cifrados </span>' + f.cif + '</div><div><span class="muted">Partituras </span>' + f.par + '</div></div></div></div>' +
-      '<div class="rule small" style="padding-bottom:28px"><div>Canciones</div><div class="muted">Ordenadas por título</div></div>' +
+      '<div class="rule small rep-head"><div>Canciones</div><div class="muted">Ordenadas por título</div></div>' +
       '<div class="grid">' + f.list.slice().sort(byTitle).map(card).join('') + '</div></section>';
   }
 
@@ -264,15 +264,15 @@
 
   // ---------- INFORMACIÓN ----------
   function viewInfo() {
-    return '<section class="cols small" style="padding-top:110px"><div style="display:flex;gap:26px"><div><div class="muted">Ministerio</div><div>' + esc(CFG.iglesia) + '</div></div><div><div class="muted">Contacto</div><div>' + esc(CFG.correo) + '</div></div></div><div></div>' +
+    return '<section class="cols small info-top"><div style="display:flex;gap:26px"><div><div class="muted">Ministerio</div><div>' + esc(CFG.iglesia) + '</div></div><div><div class="muted">Contacto</div><div>' + esc(CFG.correo) + '</div></div></div><div></div>' +
       '<div class="span2" style="max-width:620px"><h1 class="lead" style="font-size:clamp(24px,2.3vw,34px)">Sirvo en el ministerio de alabanza y escribo los cifrados de las canciones que cantamos. Aquí los comparto para que quien recién empieza en el piano pueda tocarlas.</h1>' +
       '<p style="margin:22px 0 0;max-width:440px;font-size:13px">Cada arreglo está pensado para pianistas principiantes: tonalidades cómodas para la congregación, acordes sencillos y la estructura de la canción marcada.</p>' +
       '<p style="margin:14px 0 0;max-width:440px;font-size:13px">Si una canción te sirve, la mejor forma de apoyar es suscribirte al canal y compartirla con tu equipo.</p></div></section>' +
-      '<section class="cols rule" style="margin-top:150px"><div class="small"><div>Dónde encontrarme</div><div class="muted">Canales</div></div><div></div>' +
-      '<div class="span2" style="padding-top:40px;font-size:clamp(18px,1.5vw,22px);letter-spacing:-0.01em;line-height:1.2">' +
+      '<section class="cols rule sec-lg"><div class="small"><div>Dónde encontrarme</div><div class="muted">Canales</div></div><div></div>' +
+      '<div class="span2 chans">' +
       '<a class="chan" href="' + YT + '" target="_blank" rel="noopener"><span>YouTube</span><span class="muted">Videos guía · Suscríbete ↗</span></a>' +
       '<div class="chan"><span>Cifrados PDF</span><span class="muted">Descarga libre</span></div><div class="chan"><span>Partituras</span><span class="muted">Hechas en MuseScore</span></div><div class="chan"><span>Pedidos</span><span class="muted">Escríbeme qué canción falta</span></div></div></section>' +
-      '<section class="cols rule" style="margin-top:150px"><div class="small"><div class="muted">Canciones</div><div>Índice</div></div><div></div><div class="span2" style="padding-top:40px">' +
+      '<section class="cols rule sec-lg"><div class="small"><div class="muted">Canciones</div><div>Índice</div></div><div></div><div class="span2 idx-list">' +
       DATA.slice().sort(byTitle).map(function (s) { return '<a class="idx" href="#/cancion/' + encodeURIComponent(s.id) + '"><span>' + esc(s.titulo) + '</span><span class="m">' + esc(s.artista) + '</span><span class="m">' + esc(s.tono) + '</span><span class="ar">→</span></a>'; }).join('') +
       '</div></section>';
   }
