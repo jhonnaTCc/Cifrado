@@ -36,5 +36,17 @@
     "paginas": 1,
     "instrumentos": "Piano ",
     "video": "https://youtu.be/lcazG_q9qQ8?si=qouP9ljwqMcHZfPd"
+  },
+  {
+    "titulo": "Como David",
+    "artista": "Montesanto",
+    "pdf": "pdf/como-david-montesanto-cifrado-1.pdf",
+    "tono": "Am",
+    "bpm": 134,
+    "compas": "4/4",
+    "formato": "Cifrado",
+    "nivel": "Intermedio",
+    "paginas": 1,
+    "instrumentos": "Piano"
   }
 ]
