@@ -155,7 +155,7 @@
     var h = '';
 
     h += '<section class="intro" style="padding:70px 0 100px">' +
-      '<figure class="hero-img"><img src="img/portada.jpg" alt="Piano con hojas de acordes en un templo iluminado por la mañana" onerror="this.parentNode.classList.add(\'vacia\')">' +
+      '<figure class="hero-img"><img src="img/portada.jpg" alt="Teclado de piano curvo con el título Cifrados de Alabanza y el Salmo 33:3: Cantadle cántico nuevo; hacedlo bien, tañendo con júbilo." onerror="this.parentNode.classList.add(\'vacia\')">' +
       '<figcaption class="small"><span>Imagen de portada</span><span class="muted">img/portada.jpg</span></figcaption></figure>' +
       '<div style="max-width:680px"><h1 class="lead">Acordes y partituras de canciones cristianas para pianistas que están empezando. Cada canción con su tonalidad, sus acordes y un video guía.</h1>' +
       '<p class="muted" style="margin:22px 0 0;max-width:470px">Escribo los arreglos que tocamos en el ministerio, pensados para piano y fáciles de seguir. Busca por canción o por cantante, revisa los acordes, descarga el PDF y practica con el video en YouTube.</p>' +
