@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var CFG = {}, DATA = [], LOADED = false, LOAD_ERR = false;
+  var CFG = {}, DATA = [], ARTS = {}, LOADED = false, LOAD_ERR = false;
   var LS_DARK = 'cifrados_oscuro';
   var app = document.getElementById('app');
 
@@ -48,8 +48,11 @@
       HERO_SVG = t.slice(t.indexOf('<svg'));
       var f = app.querySelector('.hero-img'); if (f && !f.classList.contains('hero-svg')) { f.className = 'hero-img hero-svg'; f.innerHTML = HERO_SVG; }
     }).catch(function () {});
-    Promise.all([getJSON('data/canciones.json'), getJSON('data/config.json').catch(function () { return {}; })])
-      .then(function (r) { DATA = prepare(r[0]); CFG = r[1] || {}; })
+    Promise.all([getJSON('data/canciones.json'), getJSON('data/config.json').catch(function () { return {}; }), getJSON('data/artistas.json').catch(function () { return []; })])
+      .then(function (r) {
+        DATA = prepare(r[0]); CFG = r[1] || {};
+        (Array.isArray(r[2]) ? r[2] : []).forEach(function (a) { if (a && a.nombre && a.imagen) ARTS[norm(a.nombre)] = pdfPath(a.imagen); });
+      })
       .catch(function () { LOAD_ERR = true; })
       .then(function () {
         YT = esc(CFG.youtubeUrl || 'https://www.youtube.com/'); CANAL = esc(CFG.canal || '');
@@ -68,7 +71,7 @@
     return Object.keys(g).map(function (name) {
       var list = g[name];
       var keys = []; list.forEach(function (s) { if (keys.indexOf(s.tono) < 0) keys.push(s.tono); });
-      return { name: name, slug: slug(name), list: list, count: list.length, keys: keys.join(' · '), mono: initials(name),
+      return { name: name, slug: slug(name), list: list, count: list.length, keys: keys.join(' · '), mono: initials(name), img: ARTS[norm(name)] || '',
         cif: list.filter(function (s) { return s.formato === 'Cifrado'; }).length,
         par: list.filter(function (s) { return s.formato === 'Partitura'; }).length };
     }).sort(function (a, b) { return b.count - a.count || a.name.localeCompare(b.name, 'es'); });
@@ -208,8 +211,8 @@
       '<div class="stage"><div class="ticks muted" aria-hidden="true"><span>—</span><span>—</span></div><div class="track-wrap"><div class="track">';
     shownF.forEach(function (f, i) {
       var href = '#/carpeta/' + encodeURIComponent(f.slug);
-      h += '<div class="item' + (f === act ? ' on' : '') + '" data-name="' + esc(f.name) + '" data-i="' + i + '" data-count="' + f.count + '" data-keys="' + esc(f.keys) + '">' +
-        '<a class="tile" href="' + href + '" aria-label="Abrir carpeta de ' + esc(f.name) + '"><span class="top"><span>' + pad(i + 1) + '</span><span>' + f.count + ' PDF</span></span>' +
+      h += '<div class="item' + (f === act ? ' on' : '') + (f.img ? ' has-img' : '') + '" data-name="' + esc(f.name) + '" data-i="' + i + '" data-count="' + f.count + '" data-keys="' + esc(f.keys) + '">' +
+        '<a class="tile" href="' + href + '" aria-label="Abrir carpeta de ' + esc(f.name) + '">' + (f.img ? '<img class="tile-img" src="' + esc(f.img) + '" alt="" loading="lazy">' : '') + '<span class="top"><span>' + pad(i + 1) + '</span><span>' + f.count + ' PDF</span></span>' +
         '<span class="mono">' + esc(f.mono) + '</span><span class="nm">' + esc(f.name) + '</span></a>' +
         '<a class="arrow" href="' + href + '" tabindex="-1" aria-hidden="true">' + I.arrow + '<span>Ver carpeta</span></a></div>';
     });
@@ -249,7 +252,8 @@
     var f = folders().filter(function (x) { return x.slug === id; })[0];
     if (!f) return '<section style="padding:120px 0"><h1 class="lead">Esta carpeta no existe.</h1><p><a href="#/">← Volver al inicio</a></p></section>';
     return '<section style="padding-top:22px"><a href="#/" class="small muted" style="display:inline-flex;align-items:center;min-height:44px">← Todas las carpetas</a>' +
-      '<div class="cols folder-head"><div class="small"><div>Carpeta</div><div class="muted">' + plural(f.count, 'canción', 'canciones') + '</div></div><div></div>' +
+      '<div class="cols folder-head"><div class="small"><div>Carpeta</div><div class="muted">' + plural(f.count, 'canción', 'canciones') + '</div></div>' +
+      (f.img ? '<div><img class="folder-img" src="' + esc(f.img) + '" alt="' + esc(f.name) + '"></div>' : '<div></div>') +
       '<div class="span2"><h1 style="font-size:clamp(40px,5.4vw,96px);line-height:.9;font-weight:500;letter-spacing:-0.045em">' + esc(f.name) + '</h1>' +
       '<div class="small" style="display:flex;flex-wrap:wrap;gap:8px 28px;margin-top:22px"><div><span class="muted">Tonos </span>' + esc(f.keys) + '</div><div><span class="muted">Cifrados </span>' + f.cif + '</div><div><span class="muted">Partituras </span>' + f.par + '</div></div></div></div>' +
       '<div class="rule small rep-head"><div>Canciones</div><div class="muted">Ordenadas por título</div></div>' +

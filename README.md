@@ -20,8 +20,11 @@ js/app.js               Funcionamiento (carpetas, buscador, fichas, vista del PD
 js/pdfjs/               pdf.js de Mozilla, para mostrar el contenido de los PDF
 data/canciones.json     Lista de canciones
 data/config.json        Canal de YouTube, iglesia y correo
+data/artistas.json      Imagen de cada carpeta (cantante o grupo)
 pdf/                    Los PDF de los cifrados
-img/portada.jpg         Imagen de la portada
+img/teclado.svg         Portada animada (teclado que se toca en bucle)
+img/portada.jpg         Portada fija (respaldo)
+img/artistas/           Imágenes de las carpetas
 .pages.yml              Configuración del panel de administración (Pages CMS)
 ```
 
@@ -44,6 +47,8 @@ El panel **no está dentro de la web**: se usa en [app.pagescms.org](https://app
 5. Pulsa **Save**. En 1–2 minutos aparece en la web, con la vista del PDF.
 
 Para **editar** una canción, ábrela, cambia lo que necesites y guarda. Para **cambiar el PDF**, sube el nuevo en el mismo campo.
+
+En **Cantantes y grupos** pones la imagen de cada carpeta: agrega una entrada, escribe el nombre **exactamente igual** que en las canciones (por ejemplo `José Luis Reyes`) y sube la imagen (mejor vertical; se recorta al centro). Las carpetas sin imagen muestran las iniciales.
 
 En **Configuración del sitio** cambias el nombre y enlace de tu canal de YouTube, la iglesia y el correo.
 
