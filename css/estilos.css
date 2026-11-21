@@ -61,6 +61,23 @@ header:hover .giant .rest, header.intro .giant .rest { opacity: 1; }
 .toggle { display: inline-grid; grid-template-columns: 96px auto; align-items: center; }
 .toggle span:last-child { font-family: var(--mono); font-size: 11px; }
 
+/* Columna de "Para músicos" + modo oscuro */
+.meta-pair { display: flex; gap: 8px 16px; align-items: flex-start; justify-content: space-between; }
+.meta-pair > div { white-space: nowrap; }
+.meta-pair .toggle { grid-template-columns: auto auto; gap: 10px; white-space: nowrap; }
+@media (max-width: 1100px) { .meta-pair { flex-wrap: wrap; justify-content: flex-start; padding-right: 0; } }
+
+/* ===== Portada: imagen + texto ===== */
+.intro { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; align-items: start; }
+.hero-img { margin: 0; }
+.hero-img img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--card); }
+.hero-img figcaption { display: none; justify-content: space-between; gap: 12px; padding-top: 8px; }
+.hero-img.vacia img { visibility: hidden; }
+.hero-img.vacia { background: var(--card); aspect-ratio: 4 / 3; position: relative; }
+.hero-img.vacia img { position: absolute; inset: 0; height: 100%; }
+.hero-img.vacia figcaption { display: flex; position: absolute; left: 14px; right: 14px; bottom: 12px; }
+@media (max-width: 640px) { .intro { grid-template-columns: 1fr; } }
+
 /* ===== Buscador ===== */
 .search { max-width: 560px; grid-column: 2 / -1; }
 .search-bar { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--fg); padding: 4px 0 6px; }

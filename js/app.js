@@ -113,9 +113,10 @@
     return '<header class="' + (S.intro ? 'intro' : '') + '">' +
       '<div class="giant"><a href="#/" aria-label="Cifrados — inicio">C<span class="rest">IFRADOS</span></a><a href="#/" aria-label="Alabanza — inicio">A<span class="rest">LABANZA</span></a></div>' +
       '<div class="meta">' +
-        '<div><div>Cifrados y partituras</div><div class="muted">Alabanza cristiana</div></div>' +
+        '<div><div>Cifrados y partituras</div><div class="muted">Piano · alabanza cristiana</div></div>' +
         '<nav aria-label="Principal"><a href="#/"' + (info || r.view === 'admin' ? ' class="muted"' : '') + '>Canciones</a><a href="#/info"' + (info ? '' : ' class="muted"') + '>Información</a></nav>' +
-        '<div><button class="toggle" data-act="dark" aria-pressed="' + S.dark + '"><span class="muted">Modo oscuro</span><span>( ' + (S.dark ? 'Y' : 'N') + ' )</span></button></div>' +
+        '<div class="meta-pair"><div><div>Para pianistas que empiezan</div><div class="muted">Libre para ver y descargar</div></div>' +
+          '<button class="toggle" data-act="dark" aria-pressed="' + S.dark + '"><span class="muted">Modo oscuro</span><span>( ' + (S.dark ? 'Y' : 'N') + ' )</span></button></div>' +
         '<div class="right"><a href="' + YT + '" target="_blank" rel="noopener">YouTube ↗</a><div class="muted">Suscríbete · ' + CANAL + '</div></div>' +
       '</div></header>';
   }
@@ -137,6 +138,7 @@
   // ---------- INICIO ----------
   var FILTROS = [
     { id: 'todas', label: 'Todas', t: function () { return true; } },
+    { id: 'empezar', label: 'Para empezar', t: function (s) { return s.nivel === 'Básico'; } },
     { id: 'cif', label: 'Cifrados', t: function (s) { return s.formato === 'Cifrado'; } },
     { id: 'par', label: 'Partituras', t: function (s) { return s.formato === 'Partitura'; } },
     { id: 'lentas', label: 'Lentas', t: function (s) { return s.bpm < 80; } },
@@ -152,10 +154,11 @@
                     : 'Prueba: ' + F.slice(0, 3).map(function (f) { return esc(f.name); }).join(', ');
     var h = '';
 
-    h += '<section class="cols" style="padding:120px 0 90px">' +
-      '<div class="small"><div>Para músicos de iglesia</div><div class="muted">Libre para ver y descargar</div></div><div></div>' +
-      '<div class="span2" style="max-width:680px"><h1 class="lead">Cifrados y partituras de canciones cristianas para servir en la alabanza. Cada canción con su tonalidad, su tempo y un video guía.</h1>' +
-      '<p class="muted" style="margin:22px 0 0;max-width:470px">Escribo los arreglos que usamos en el ministerio y los comparto aquí en PDF. Busca por canción o por cantante, abre la ficha, descárgala y practícala con el video en YouTube.</p>' +
+    h += '<section class="intro" style="padding:70px 0 100px">' +
+      '<figure class="hero-img"><img src="img/portada.jpg" alt="Piano con hojas de acordes en un templo iluminado por la mañana" onerror="this.parentNode.classList.add(\'vacia\')">' +
+      '<figcaption class="small"><span>Imagen de portada</span><span class="muted">img/portada.jpg</span></figcaption></figure>' +
+      '<div style="max-width:680px"><h1 class="lead">Acordes y partituras de canciones cristianas para pianistas que están empezando. Cada canción con su tonalidad, sus acordes y un video guía.</h1>' +
+      '<p class="muted" style="margin:22px 0 0;max-width:470px">Escribo los arreglos que tocamos en el ministerio, pensados para piano y fáciles de seguir. Busca por canción o por cantante, revisa los acordes, descarga el PDF y practica con el video en YouTube.</p>' +
       '<div class="btns" style="margin-top:30px"><a class="btn btn-solid" href="#buscar" data-act="scroll">Buscar un cifrado ↓</a>' +
       '<a class="btn btn-line" href="' + YT + '" target="_blank" rel="noopener">' + I.play('#D7261E') + 'Suscribirse en YouTube</a></div></div></section>';
 
@@ -197,15 +200,15 @@
     h += '<div class="grid">' + grid.map(card).join('') + '</div></section>';
 
     // Cómo usar
-    var steps = [['Busca la canción', 'Escribe su nombre o el del cantante, o entra a la carpeta del grupo.'], ['Revisa tono y tempo', 'Tonalidad, compás, bpm y capo están en la ficha de cada canción.'], ['Descarga y practica', 'Baja el PDF y ensaya con el video guía en el canal de YouTube.']];
+    var steps = [['Busca la canción', 'Escribe su nombre o el del cantante, o entra a la carpeta del grupo.'], ['Revisa tono y acordes', 'La ficha muestra la tonalidad, el tempo y los acordes que vas a necesitar en el piano.'], ['Descarga y practica', 'Baja el PDF y toca junto al video guía en piano del canal de YouTube.']];
     h += '<section class="cols rule small" style="margin-top:150px"><div><div>Cómo usar</div><div class="muted">Tres pasos</div></div>' +
       steps.map(function (s, i) { return '<div><div class="monof muted" style="font-size:11px">0' + (i + 1) + '</div><div style="font-size:20px;letter-spacing:-0.01em;margin:34px 0 8px">' + s[0] + '</div><div class="muted" style="max-width:260px">' + s[1] + '</div></div>'; }).join('') + '</section>';
 
     // YouTube
     var recent = DATA.slice().reverse().slice(0, 4);
     h += '<section class="yt" aria-label="Canal de YouTube"><div class="cols small"><div><div>YouTube</div><div class="muted">' + CANAL + '</div></div><div></div>' +
-      '<div class="span2" style="padding-top:80px"><h2 class="lead" style="max-width:640px">Cada canción tiene su video guía. Suscríbete y aprende las nuevas antes del domingo.</h2>' +
-      '<p class="muted" style="margin:20px 0 0;max-width:460px;font-size:13px">Subo los videos mientras termino cada cifrado. Al suscribirte y activar la campana te llega el aviso, y el canal crece para llegar a más músicos.</p>' +
+      '<div class="span2" style="padding-top:80px"><h2 class="lead" style="max-width:640px">Cada canción tiene su video guía en piano. Suscríbete y aprende las nuevas antes del domingo.</h2>' +
+      '<p class="muted" style="margin:20px 0 0;max-width:460px;font-size:13px">En cada video muestro los acordes en el teclado, despacio y paso a paso. Al suscribirte y activar la campana te llega el aviso, y el canal crece para llegar a más pianistas.</p>' +
       '<div class="btns" style="margin-top:30px"><a class="btn btn-red" style="min-height:48px;font-size:14px" href="' + YT + '" target="_blank" rel="noopener">' + I.play('#fff') + 'Suscribirse al canal</a>' +
       '<a class="btn btn-line" style="min-height:48px;font-size:14px" href="' + YT + '" target="_blank" rel="noopener">Ver todos los videos ↗</a></div>' +
       '<div class="muted" style="margin-top:70px;padding-bottom:8px">Videos guía recientes</div>' +
@@ -234,7 +237,7 @@
     var s = DATA[i], n = DATA.length, pv = DATA[(i - 1 + n) % n], nx = DATA[(i + 1) % n];
     var rows = [
       ['Cantante / grupo', s.artista], ['Tonalidad', s.tono + ' mayor'], ['Tempo', s.bpm + ' bpm'], ['Compás', s.compas],
-      ['Capo', s.capo || 'Sin capo'], ['Instrumentos', String(s.instrumentos || '').split(',').map(function (x) { return x.trim(); }).filter(Boolean).join('\n')],
+      ['Acordes', s.acordes || '—'], ['Instrumentos', String(s.instrumentos || '').split(',').map(function (x) { return x.trim(); }).filter(Boolean).join('\n')],
       ['Nivel', s.nivel], ['Formato', s.formato + ' · PDF · ' + plural(Number(s.paginas) || 1, 'página', 'páginas')], ['Arreglo', 'Ministerio de alabanza']
     ];
     var vid = ytId(s.video);
@@ -262,8 +265,8 @@
   // ---------- INFORMACIÓN ----------
   function viewInfo() {
     return '<section class="cols small" style="padding-top:110px"><div style="display:flex;gap:26px"><div><div class="muted">Ministerio</div><div>' + esc(CFG.iglesia) + '</div></div><div><div class="muted">Contacto</div><div>' + esc(CFG.correo) + '</div></div></div><div></div>' +
-      '<div class="span2" style="max-width:620px"><h1 class="lead" style="font-size:clamp(24px,2.3vw,34px)">Sirvo en el ministerio de alabanza y escribo los cifrados de las canciones que cantamos. Aquí los comparto para que cualquier músico pueda usarlos.</h1>' +
-      '<p style="margin:22px 0 0;max-width:440px;font-size:13px">Cada arreglo está pensado para un equipo de iglesia: tonalidades cómodas para la congregación, acordes claros y la estructura de la canción marcada.</p>' +
+      '<div class="span2" style="max-width:620px"><h1 class="lead" style="font-size:clamp(24px,2.3vw,34px)">Sirvo en el ministerio de alabanza y escribo los cifrados de las canciones que cantamos. Aquí los comparto para que quien recién empieza en el piano pueda tocarlas.</h1>' +
+      '<p style="margin:22px 0 0;max-width:440px;font-size:13px">Cada arreglo está pensado para pianistas principiantes: tonalidades cómodas para la congregación, acordes sencillos y la estructura de la canción marcada.</p>' +
       '<p style="margin:14px 0 0;max-width:440px;font-size:13px">Si una canción te sirve, la mejor forma de apoyar es suscribirte al canal y compartirla con tu equipo.</p></div></section>' +
       '<section class="cols rule" style="margin-top:150px"><div class="small"><div>Dónde encontrarme</div><div class="muted">Canales</div></div><div></div>' +
       '<div class="span2" style="padding-top:40px;font-size:clamp(18px,1.5vw,22px);letter-spacing:-0.01em;line-height:1.2">' +
@@ -276,7 +279,7 @@
 
   // ---------- ADMINISTRACIÓN ----------
   var KEYS = ['C','C#','Db','D','Eb','E','F','F#','G','Ab','A','Bb','B'], METERS = ['4/4','3/4','6/8','6/4','2/4','12/8'];
-  function blank() { return { id: null, titulo: '', artista: '', tono: 'G', bpm: '72', compas: '4/4', capo: '', formato: 'Cifrado', nivel: 'Básico', paginas: '1', instrumentos: 'Guitarra, piano', video: '', pdf: '', _file: '', _url: '' }; }
+  function blank() { return { id: null, titulo: '', artista: '', tono: 'G', bpm: '72', compas: '4/4', acordes: '', formato: 'Cifrado', nivel: 'Básico', paginas: '1', instrumentos: 'Piano', video: '', pdf: '', _file: '', _url: '' }; }
   function opt(list, v) { return list.map(function (o) { return '<option' + (o === v ? ' selected' : '') + '>' + o + '</option>'; }).join(''); }
   function field(id, label, html, full) { return '<div class="field' + (full ? ' full' : '') + '"><label for="f-' + id + '">' + label + '</label>' + html + '</div>'; }
   function inp(id, v, type, ph) { return '<input id="f-' + id + '" data-f="' + id + '" type="' + (type || 'text') + '" value="' + esc(v) + '"' + (ph ? ' placeholder="' + esc(ph) + '"' : '') + '>'; }
@@ -320,11 +323,11 @@
           field('tono', 'Tonalidad', sel('tono', KEYS, d.tono)) +
           field('bpm', 'Tempo (bpm)', inp('bpm', d.bpm, 'number')) +
           field('compas', 'Compás', sel('compas', METERS, d.compas)) +
-          field('capo', 'Capo', inp('capo', d.capo, 'text', 'Sin capo')) +
+          field('acordes', 'Acordes que usa', inp('acordes', d.acordes, 'text', 'G · C · D · Em')) +
           field('formato', 'Formato', sel('formato', ['Cifrado', 'Partitura'], d.formato)) +
           field('nivel', 'Nivel', sel('nivel', ['Básico', 'Intermedio', 'Avanzado'], d.nivel)) +
           field('paginas', 'Páginas', inp('paginas', d.paginas, 'number')) +
-          field('instrumentos', 'Instrumentos', inp('instrumentos', d.instrumentos, 'text', 'Guitarra, piano')) +
+          field('instrumentos', 'Instrumentos', inp('instrumentos', d.instrumentos, 'text', 'Piano')) +
           field('video', 'Enlace del video guía en YouTube', inp('video', d.video, 'url', 'https://youtu.be/…'), true) +
         '</div>' + (S.err ? '<div class="err" role="alert">' + esc(S.err) + '</div>' : '') +
         '<div class="btns" style="gap:8px;padding-top:6px"><button type="submit" class="btn btn-solid">' + (d.id ? 'Guardar cambios' : 'Agregar canción') + '</button><button type="button" class="btn btn-line" data-act="cancelar">Cancelar</button></div></form>';
@@ -421,7 +424,7 @@
     if (!d.pdf) { S.err = 'Elige el archivo PDF de la canción.'; render(); return; }
     var clean = {
       id: d.id || uniqueId(slug(d.titulo)), titulo: String(d.titulo).trim(), artista: String(d.artista).trim(), tono: d.tono,
-      bpm: parseInt(d.bpm, 10) || 0, compas: d.compas, capo: d.capo || 'Sin capo', formato: d.formato, nivel: d.nivel,
+      bpm: parseInt(d.bpm, 10) || 0, compas: d.compas, acordes: String(d.acordes || '').trim(), formato: d.formato, nivel: d.nivel,
       paginas: parseInt(d.paginas, 10) || 1, instrumentos: d.instrumentos, video: String(d.video || '').trim(), pdf: d.pdf
     };
     if (d.id) DATA = DATA.map(function (s) { return s.id === d.id ? clean : s; }); else DATA.push(clean);
@@ -433,7 +436,7 @@
   function uniqueId(base) { var id = base || 'cancion', n = 2; while (DATA.some(function (s) { return s.id === id; })) id = base + '-' + n++; return id; }
   function exportData() {
     var txt = '// Lista de canciones del sitio (generado desde el panel de administración).\n' +
-      '// "artista" define la carpeta · "pdf" es la ruta del archivo en la carpeta /pdf · "video" es el enlace de YouTube.\n' +
+      '// "artista" define la carpeta · "acordes" son los acordes de la canción · "pdf" es la ruta del archivo en la carpeta /pdf · "video" es el enlace de YouTube.\n' +
       'window.CANCIONES = [\n' + DATA.map(function (s) { return '  ' + JSON.stringify(s); }).join(',\n') + '\n];\n';
     var blob = new Blob([txt], { type: 'text/javascript' }), url = URL.createObjectURL(blob), a = document.createElement('a');
     a.href = url; a.download = 'canciones.js'; document.body.appendChild(a); a.click(); a.remove();

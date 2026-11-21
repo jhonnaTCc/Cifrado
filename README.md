@@ -1,6 +1,6 @@
 # Cifrados de Alabanza
 
-Sitio web para compartir cifrados y partituras de canciones cristianas: carpetas por cantante o grupo, buscador, ficha de cada canción (tono, tempo, compás, capo…), descarga del PDF y video guía de YouTube.
+Sitio web para compartir cifrados y partituras de canciones cristianas, pensado para pianistas que están empezando: carpetas por cantante o grupo, buscador, ficha de cada canción (tono, acordes, tempo, compás…), descarga del PDF y video guía de YouTube.
 
 Es un sitio estático (HTML, CSS y JavaScript): no necesita servidor y se publica gratis con **GitHub Pages**.
 
@@ -52,12 +52,16 @@ Campos de cada canción:
 | `tono` | `"G"` | Tonalidad |
 | `bpm` | `70` | Tempo |
 | `compas` | `"4/4"` | Compás |
-| `capo` | `"Capo 2 (forma G)"` | Capo |
+| `acordes` | `"G · C · D · Em"` | Acordes que se usan en la canción |
 | `formato` | `"Cifrado"` o `"Partitura"` | Tipo de hoja |
 | `nivel` | `"Básico"` | Dificultad |
 | `paginas` | `1` | Páginas del PDF |
-| `instrumentos` | `"Guitarra, piano, bajo"` | Instrumentos |
+| `instrumentos` | `"Piano"` | Instrumentos |
 | `video` | `"https://youtu.be/XXXXXXXXXXX"` | Video guía (se reproduce dentro de la ficha) |
 | `pdf` | `"pdf/renuevame.pdf"` | Ruta del PDF dentro de la carpeta `pdf/` |
 
 > Las canciones que vienen de ejemplo tienen tonos y tempos de muestra y aún no tienen PDF ni video: reemplázalas por las tuyas.
+
+## Imagen de portada
+
+Guarda la imagen como `img/portada.jpg` (horizontal 4:3, mínimo 1600 × 1200 px). Mientras no exista, la portada muestra un recuadro gris.
