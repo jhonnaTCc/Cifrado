@@ -1,0 +1,87 @@
+# Configuración del panel de administración (Pages CMS: https://app.pagescms.org)
+# Solo puede editar quien tenga acceso a este repositorio con su cuenta de GitHub.
+
+media:
+  - name: pdf
+    label: PDF de cifrados
+    input: pdf
+    output: pdf
+    extensions: [pdf]
+
+content:
+  - name: canciones
+    label: Canciones
+    type: file
+    path: data/canciones.json
+    format: json
+    list: true
+    fields:
+      - name: titulo
+        label: Título de la canción
+        type: string
+        required: true
+      - name: artista
+        label: Cantante o grupo (define la carpeta)
+        type: string
+        required: true
+      - name: pdf
+        label: Archivo PDF del cifrado
+        type: file
+        options:
+          media: pdf
+          extensions: [pdf]
+          rename: safe
+      - name: tono
+        label: Tonalidad
+        type: select
+        options:
+          values: [C, C#, Db, D, Eb, E, F, F#, G, Ab, A, Bb, B, Am, Bm, Cm, Dm, Em, Fm, Gm]
+      - name: acordes
+        label: Acordes que usa (ej. G · C · D · Em)
+        type: string
+      - name: bpm
+        label: Tempo (bpm)
+        type: number
+      - name: compas
+        label: Compás
+        type: select
+        options:
+          values: ["4/4", "3/4", "6/8", "6/4", "2/4", "12/8"]
+      - name: formato
+        label: Formato
+        type: select
+        options:
+          values: [Cifrado, Partitura]
+      - name: nivel
+        label: Nivel
+        type: select
+        options:
+          values: [Básico, Intermedio, Avanzado]
+      - name: paginas
+        label: Páginas del PDF
+        type: number
+      - name: instrumentos
+        label: Instrumentos
+        type: string
+      - name: video
+        label: Enlace del video guía en YouTube
+        type: string
+
+  - name: configuracion
+    label: Configuración del sitio
+    type: file
+    path: data/config.json
+    format: json
+    fields:
+      - name: canal
+        label: Nombre del canal de YouTube (ej. @micanal)
+        type: string
+      - name: youtubeUrl
+        label: Enlace del canal (deja ?sub_confirmation=1 al final)
+        type: string
+      - name: iglesia
+        label: Nombre de la iglesia
+        type: string
+      - name: correo
+        label: Correo de contacto
+        type: string

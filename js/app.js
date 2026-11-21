@@ -1,17 +1,17 @@
 /* Cifrados de Alabanza — sitio estático (sin servidor).
-   Las canciones vienen de data/canciones.js y la configuración de data/config.js.
-   Rutas: #/  ·  #/cancion/<id>  ·  #/carpeta/<carpeta>  ·  #/info  ·  #/admin  */
+   Las canciones vienen de data/canciones.json y la configuración de data/config.json
+   (se editan con Pages CMS: https://app.pagescms.org). Los PDF se muestran con pdf.js (js/pdfjs).
+   Rutas: #/  ·  #/cancion/<id>  ·  #/carpeta/<carpeta>  ·  #/info  */
 (function () {
   'use strict';
 
-  var CFG = window.SITIO || {};
-  var BASE = (window.CANCIONES || []).slice();
-  var LS_DATA = 'cifrados_datos_v1', LS_DARK = 'cifrados_oscuro';
+  var CFG = {}, DATA = [], LOADED = false, LOAD_ERR = false;
+  var LS_DARK = 'cifrados_oscuro';
   var app = document.getElementById('app');
 
   // ---------- utilidades ----------
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-  function norm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim(); }
+  function norm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim(); }
   function slug(s) { return norm(s).replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''); }
   function pad(n) { return String(n).padStart(2, '0'); }
   function plural(n, a, b) { return n + ' ' + (n === 1 ? a : b); }
@@ -19,19 +19,40 @@
   function store(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
   function read(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 
-  // ---------- datos ----------
-  function loadData() {
-    var raw = read(LS_DATA);
-    if (raw) { try { var d = JSON.parse(raw); if (Array.isArray(d)) return d; } catch (e) {} }
-    return BASE.slice();
+  // ---------- datos (data/canciones.json y data/config.json, editables con Pages CMS) ----------
+  function pdfPath(p) {
+    p = String(p || '').trim();
+    if (!p || /^https?:/i.test(p)) return p;
+    return p.replace(/^\/+/, '').replace(/^Cifrado\//i, '');   // rutas relativas: funcionan en jhonnatcc.github.io/Cifrado/
   }
-  var DATA = loadData();
-  var localChanges = !!read(LS_DATA);
-  function saveData() { store(LS_DATA, JSON.stringify(DATA)); localChanges = true; }
+  function prepare(list) {
+    var seen = {};
+    return (Array.isArray(list) ? list : []).filter(function (s) { return s && s.titulo; }).map(function (s) {
+      var base = slug(s.titulo) || 'cancion', id = base, n = 2;
+      while (seen[id]) id = base + '-' + n++;
+      seen[id] = true;
+      return {
+        id: id, titulo: String(s.titulo).trim(), artista: String(s.artista || 'Sin carpeta').trim(),
+        tono: s.tono || '', bpm: Number(s.bpm) || 0, compas: s.compas || '', acordes: s.acordes || '',
+        formato: s.formato || 'Cifrado', nivel: s.nivel || 'Básico', paginas: Number(s.paginas) || 1,
+        instrumentos: s.instrumentos || 'Piano', video: s.video || '', pdf: pdfPath(s.pdf)
+      };
+    });
+  }
+  function getJSON(url) { return fetch(url + '?v=' + Date.now(), { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }); }
+  var YT = '', CANAL = '';
+  function load() {
+    Promise.all([getJSON('data/canciones.json'), getJSON('data/config.json').catch(function () { return {}; })])
+      .then(function (r) { DATA = prepare(r[0]); CFG = r[1] || {}; })
+      .catch(function () { LOAD_ERR = true; })
+      .then(function () {
+        YT = esc(CFG.youtubeUrl || 'https://www.youtube.com/'); CANAL = esc(CFG.canal || '');
+        LOADED = true; render();
+      });
+  }
 
   var S = {
-    dark: read(LS_DARK) === '1', filtro: 'todas', q: '', activa: '',
-    draft: null, err: '', aviso: '', confirm: null, intro: true
+    dark: read(LS_DARK) === '1', filtro: 'todas', q: '', activa: '', intro: true
   };
   document.body.classList.toggle('dark', S.dark);
 
@@ -99,7 +120,6 @@
     arrow: '<svg width="58" height="58" viewBox="0 0 58 58" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 55 L55 3"/><path d="M14 3 H55 V44"/></svg>',
     file: '<svg width="22" height="26" viewBox="0 0 22 26" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M1 1 H14 L21 8 V25 H1 Z"/><path d="M14 1 V8 H21"/><path d="M11 12 V20 M7.5 16 L11 12 L14.5 16"/></svg>'
   };
-  var YT = esc(CFG.youtubeUrl || 'https://www.youtube.com/'), CANAL = esc(CFG.canal || '');
 
   // ---------- rutas ----------
   function route() {
@@ -114,7 +134,7 @@
       '<div class="giant"><a href="#/" aria-label="Cifrados — inicio">C<span class="rest">IFRADOS</span></a><a href="#/" aria-label="Alabanza — inicio">A<span class="rest">LABANZA</span></a></div>' +
       '<div class="meta">' +
         '<div><div>Cifrados y partituras</div><div class="muted">Piano · alabanza cristiana</div></div>' +
-        '<nav aria-label="Principal"><a href="#/"' + (info || r.view === 'admin' ? ' class="muted"' : '') + '>Canciones</a><a href="#/info"' + (info ? '' : ' class="muted"') + '>Información</a></nav>' +
+        '<nav aria-label="Principal"><a href="#/"' + (info ? ' class="muted"' : '') + '>Canciones</a><a href="#/info"' + (info ? '' : ' class="muted"') + '>Información</a></nav>' +
         '<div class="meta-pair"><div><div>Para pianistas que empiezan</div><div class="muted">Libre para ver y descargar</div></div>' +
           '<button class="toggle" data-act="dark" aria-pressed="' + S.dark + '"><span class="muted">Modo oscuro</span><span>( ' + (S.dark ? 'Y' : 'N') + ' )</span></button></div>' +
         '<div class="right"><a href="' + YT + '" target="_blank" rel="noopener">YouTube ↗</a><div class="muted">Suscríbete · ' + CANAL + '</div></div>' +
@@ -125,14 +145,14 @@
       '<div><div class="muted">©</div><div>' + new Date().getFullYear() + '</div></div>' +
       '<div><div class="muted">Uso</div><div>Libre para iglesias</div></div>' +
       '<div><div class="muted">Canal</div><a href="' + YT + '" target="_blank" rel="noopener">' + CANAL + ' ↗</a></div>' +
-      '<div class="end"><a href="#/admin"><span class="muted">Acceso</span><br>Administrar</a><button data-act="top" style="text-align:right"><span class="muted">Volver</span><br>Arriba ↑</button></div>' +
+      '<div class="end"><button data-act="top" style="text-align:right"><span class="muted">Volver</span><br>Arriba ↑</button></div>' +
       '</footer>';
   }
   function card(s) {
     return '<a class="card" href="#/cancion/' + encodeURIComponent(s.id) + '" aria-label="Abrir ' + esc(s.titulo) + ' de ' + esc(s.artista) + '">' +
       '<div class="head"><div><div>' + esc(s.titulo) + '</div><div class="muted small">' + esc(s.artista) + ' · ' + esc(s.tono) + ' · ' + esc(s.bpm) + ' bpm</div></div>' +
       '<div class="muted small monof">' + (s.formato === 'Cifrado' ? 'CIF' : 'PART') + '</div></div>' +
-      '<div class="thumb">' + sheet(s, false) + '</div></a>';
+      '<div class="thumb"' + (s.pdf ? ' data-pdf="' + esc(s.pdf) + '"' : '') + '>' + sheet(s, false) + '</div></a>';
   }
 
   // ---------- INICIO ----------
@@ -247,7 +267,8 @@
         '<div style="font-size:clamp(20px,2vw,30px);letter-spacing:-0.02em;line-height:1.05;max-width:80%">' + esc(s.titulo) + '<br><span style="color:#8a8a8a">Video guía · pronto</span></div></div><div class="play">' + I.play('#fff', 16, 18) + '</div></a>';
     var pdfName = String(s.pdf || '').split('/').pop();
     return '<main class="detail">' +
-      '<div class="prev">' + sheet(s, true) + '</div>' +
+      '<div class="prev"><div class="pdf-pages" data-pdf-full="' + esc(s.pdf) + '"><div class="pdf-loading small muted">Cargando el cifrado…</div></div>' +
+        '<div class="pdf-fallback" hidden>' + sheet(s, true) + '<div class="small muted" style="margin-top:12px;text-align:center">Vista de ejemplo: el PDF de esta canción aún no está subido.</div></div></div>' +
       '<div class="info"><div class="between" style="align-items:flex-start;padding-bottom:22px;border-bottom:1px solid var(--line)">' +
         '<div><h1 style="font-size:14px">' + esc(s.titulo) + '</h1><a class="small muted" style="text-decoration:underline;text-underline-offset:2px" href="#/carpeta/' + encodeURIComponent(slug(s.artista)) + '">' + esc(s.artista) + '</a><span class="small muted"> · ' + esc(s.formato) + '</span></div>' +
         '<button class="close" data-act="back" aria-label="Cerrar ficha"><span></span></button></div>' +
@@ -277,72 +298,16 @@
       '</div></section>';
   }
 
-  // ---------- ADMINISTRACIÓN ----------
-  var KEYS = ['C','C#','Db','D','Eb','E','F','F#','G','Ab','A','Bb','B'], METERS = ['4/4','3/4','6/8','6/4','2/4','12/8'];
-  function blank() { return { id: null, titulo: '', artista: '', tono: 'G', bpm: '72', compas: '4/4', acordes: '', formato: 'Cifrado', nivel: 'Básico', paginas: '1', instrumentos: 'Piano', video: '', pdf: '', _file: '', _url: '' }; }
-  function opt(list, v) { return list.map(function (o) { return '<option' + (o === v ? ' selected' : '') + '>' + o + '</option>'; }).join(''); }
-  function field(id, label, html, full) { return '<div class="field' + (full ? ' full' : '') + '"><label for="f-' + id + '">' + label + '</label>' + html + '</div>'; }
-  function inp(id, v, type, ph) { return '<input id="f-' + id + '" data-f="' + id + '" type="' + (type || 'text') + '" value="' + esc(v) + '"' + (ph ? ' placeholder="' + esc(ph) + '"' : '') + '>'; }
-  function sel(id, list, v) { return '<select id="f-' + id + '" data-f="' + id + '">' + opt(list, v) + '</select>'; }
-
-  function viewAdmin() {
-    var F = folders(), d = S.draft, h = '';
-    h += '<main aria-label="Administración" style="padding-top:22px"><div class="between" style="align-items:flex-end;padding:60px 0 34px;gap:16px">' +
-      '<div><div class="small muted">Solo administrador</div><h1 style="margin-top:4px;font-size:clamp(34px,3.6vw,56px);line-height:.95;font-weight:500;letter-spacing:-0.04em">Administrar cifrados</h1>' +
-      '<div class="small muted" style="margin-top:10px;max-width:520px">Agrega o edita canciones y descarga el archivo <code>canciones.js</code> actualizado para subirlo a GitHub junto con los PDF.</div></div>' +
-      '<div class="btns" style="gap:8px"><button class="btn btn-solid" data-act="nuevo">+ Nueva canción</button><button class="btn btn-line" data-act="exportar">Descargar canciones.js</button></div></div>';
-    h += '<div class="note" style="margin-bottom:14px"><b>Cómo publicar los cambios:</b> 1) guarda aquí las canciones · 2) pulsa «Descargar canciones.js» · 3) en GitHub sube ese archivo a la carpeta <code>data/</code> y los PDF a la carpeta <code>pdf/</code> (con el nombre que indica cada canción). En 1–2 minutos se ve en la web.' +
-      (localChanges ? ' <br><span class="muted">Tienes cambios guardados solo en este navegador.</span> <button data-act="reset" style="text-decoration:underline">Descartar cambios locales</button>' : '') + '</div>';
-    if (S.aviso) h += '<div class="note between" role="status" style="align-items:center;margin-bottom:14px"><span>' + esc(S.aviso) + '</span><button class="muted" data-act="aviso">Cerrar</button></div>';
-
-    h += '<div class="adm"><div class="list"><div class="kpis"><div><b>' + DATA.length + '</b><span class="muted">Canciones</span></div><div><b>' + F.length + '</b><span class="muted">Carpetas</span></div>' +
-      '<div><b>' + DATA.filter(function (s) { return s.pdf; }).length + '</b><span class="muted">Con PDF</span></div><div><b>' + DATA.filter(function (s) { return ytId(s.video); }).length + '</b><span class="muted">Con video</span></div></div>' +
-      '<div class="tbl"><div class="tr th"><span>Canción</span><span>Cantante / grupo</span><span>Tono</span><span>Video</span><span style="text-align:right">Acciones</span></div>';
-    DATA.slice().sort(function (a, b) { return a.artista.localeCompare(b.artista, 'es') || byTitle(a, b); }).forEach(function (s) {
-      var conf = S.confirm === s.id;
-      h += '<div class="tr' + (d && d.id === s.id ? ' sel' : '') + '"><span>' + esc(s.titulo) + '</span><span class="muted">' + esc(s.artista) + '</span><span class="monof small">' + esc(s.tono) + '</span>' +
-        '<span class="small' + (ytId(s.video) ? '' : ' muted') + '">' + (ytId(s.video) ? 'Sí' : 'Falta') + '</span>' +
-        '<span class="acts"><button class="pill" data-act="editar" data-id="' + esc(s.id) + '">Editar</button><button class="pill' + (conf ? ' danger' : '') + '" data-act="borrar" data-id="' + esc(s.id) + '">' + (conf ? '¿Seguro?' : 'Eliminar') + '</button></span></div>';
-    });
-    h += '</div></div><div class="form">';
-    if (!d) {
-      h += '<div style="padding:40px 0"><div style="font-size:20px;letter-spacing:-0.01em">Ninguna canción abierta</div><div class="muted" style="margin-top:8px;max-width:300px">Pulsa «Editar» en una canción de la lista, o agrega una nueva con su PDF.</div>' +
-        '<button class="btn btn-solid" data-act="nuevo" style="margin-top:22px">+ Nueva canción</button></div>';
-    } else {
-      var pdfLabel = d._file || (d.pdf ? d.pdf.split('/').pop() : '');
-      h += '<form id="form" novalidate style="display:flex;flex-direction:column;gap:14px">' +
-        '<div class="between" style="align-items:baseline;padding-bottom:12px;border-bottom:1px solid var(--line)"><div style="font-size:14px">' + (d.id ? 'Editar · ' + esc(d.titulo) : 'Nueva canción') + '</div><button type="button" class="small muted" data-act="cancelar">Cancelar</button></div>' +
-        '<div><div class="small" style="margin-bottom:6px">Archivo PDF</div><label class="drop" for="f-file">' + I.file +
-        '<span style="display:flex;flex-direction:column;min-width:0"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(pdfLabel || 'Elige el PDF del cifrado o partitura') + '</span>' +
-        '<span class="small muted">' + (pdfLabel ? 'Súbelo a GitHub en la carpeta pdf/ con este nombre · pulsa para cambiarlo' : 'Pulsa aquí para buscarlo en tu equipo') + '</span></span></label>' +
-        '<input id="f-file" type="file" accept="application/pdf,.pdf" class="sr"></div>' +
-        '<div class="fgrid">' +
-          field('titulo', 'Título de la canción', inp('titulo', d.titulo, 'text', 'Ej. Renuévame'), true) +
-          field('artista', 'Cantante o agrupación <span class="muted">· define la carpeta</span>', inp('artista', d.artista, 'text', 'Ej. Marcos Witt').replace('>', ' list="artistas">') +
-            '<datalist id="artistas">' + F.map(function (f) { return '<option value="' + esc(f.name) + '">'; }).join('') + '</datalist>', true) +
-          field('tono', 'Tonalidad', sel('tono', KEYS, d.tono)) +
-          field('bpm', 'Tempo (bpm)', inp('bpm', d.bpm, 'number')) +
-          field('compas', 'Compás', sel('compas', METERS, d.compas)) +
-          field('acordes', 'Acordes que usa', inp('acordes', d.acordes, 'text', 'G · C · D · Em')) +
-          field('formato', 'Formato', sel('formato', ['Cifrado', 'Partitura'], d.formato)) +
-          field('nivel', 'Nivel', sel('nivel', ['Básico', 'Intermedio', 'Avanzado'], d.nivel)) +
-          field('paginas', 'Páginas', inp('paginas', d.paginas, 'number')) +
-          field('instrumentos', 'Instrumentos', inp('instrumentos', d.instrumentos, 'text', 'Piano')) +
-          field('video', 'Enlace del video guía en YouTube', inp('video', d.video, 'url', 'https://youtu.be/…'), true) +
-        '</div>' + (S.err ? '<div class="err" role="alert">' + esc(S.err) + '</div>' : '') +
-        '<div class="btns" style="gap:8px;padding-top:6px"><button type="submit" class="btn btn-solid">' + (d.id ? 'Guardar cambios' : 'Agregar canción') + '</button><button type="button" class="btn btn-line" data-act="cancelar">Cancelar</button></div></form>';
-    }
-    return h + '</div></div></main>';
-  }
-
   // ---------- render ----------
   var lastView = '';
   function render() {
     var r = route(), body;
-    if (r.view === 'cancion') body = viewSong(r.id);
+    if (r.view === 'admin') { location.replace('#/'); return; }
+    if (!LOADED) { app.innerHTML = '<div class="wrap">' + header(r) + '<p class="muted" style="padding:80px 0">Cargando canciones…</p></div>'; return; }
+    if (LOAD_ERR) body = '<section style="padding:80px 0"><h1 class="lead">No se pudo cargar la lista de canciones.</h1><p class="muted">Revisa que el archivo data/canciones.json exista y esté bien escrito.</p></section>';
+    else if (r.view === 'cancion') body = viewSong(r.id);
     else if (r.view === 'carpeta') body = viewFolder(r.id);
     else if (r.view === 'info') body = viewInfo();
-    else if (r.view === 'admin') body = viewAdmin();
     else body = viewHome();
 
     var ae = document.activeElement, fid = ae && ae.id, pos = null;
@@ -353,7 +318,8 @@
     var key = r.view + '/' + r.id;
     if (key !== lastView) { if (lastView) window.scrollTo(0, 0); lastView = key; }
     bindGallery();
-    var t = { inicio: 'Cifrados de Alabanza', info: 'Información · Cifrados de Alabanza', admin: 'Administrar · Cifrados de Alabanza' }[r.view];
+    renderPdfs();
+    var t = { inicio: 'Cifrados de Alabanza', info: 'Información · Cifrados de Alabanza' }[r.view];
     if (r.view === 'cancion') { var s = DATA.filter(function (x) { return x.id === r.id; })[0]; t = s ? s.titulo + ' — ' + s.artista + ' · Cifrado' : t; }
     if (r.view === 'carpeta') { var f = folders().filter(function (x) { return x.slug === r.id; })[0]; t = f ? f.name + ' · Cifrados' : t; }
     document.title = t || 'Cifrados de Alabanza';
@@ -378,73 +344,91 @@
   }
   function set(id, txt) { var e = document.getElementById(id); if (e) e.textContent = txt; }
 
+  // ---------- vista real de los PDF (pdf.js) ----------
+  var pdfjsP = null, THUMBS = {}, QUEUE = [], BUSY = 0;
+  function pdfjs() {
+    if (!pdfjsP) pdfjsP = import('./pdfjs/pdf.min.mjs').then(function (m) {
+      m.GlobalWorkerOptions.workerSrc = new URL('js/pdfjs/pdf.worker.min.mjs', location.href).href;
+      return m;
+    });
+    return pdfjsP;
+  }
+  function closeDoc(doc) { try { if (doc.loadingTask && doc.loadingTask.destroy) doc.loadingTask.destroy(); else if (doc.destroy) doc.destroy(); } catch (e) {} }
+  function openPdf(url) { return pdfjs().then(function (m) { return m.getDocument({ url: url }).promise; }); }
+  function drawPage(doc, n, cssWidth) {
+    return doc.getPage(n).then(function (page) {
+      var v1 = page.getViewport({ scale: 1 }), dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+      var vp = page.getViewport({ scale: (cssWidth * dpr) / v1.width });
+      var c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+      var ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+      return page.render({ canvasContext: ctx, viewport: vp, canvas: c }).promise.then(function () { return c; });
+    });
+  }
+  // Miniaturas: se generan una vez por PDF y se guardan en memoria
+  function thumb(url) {
+    if (THUMBS[url]) return THUMBS[url];
+    THUMBS[url] = new Promise(function (res, rej) { QUEUE.push({ url: url, res: res, rej: rej }); pump(); });
+    return THUMBS[url];
+  }
+  function pump() {
+    while (BUSY < 2 && QUEUE.length) {
+      var job = QUEUE.shift(); BUSY++;
+      (function (job) {
+        openPdf(job.url).then(function (doc) { return drawPage(doc, 1, 320).then(function (c) { closeDoc(doc); return c.toDataURL('image/jpeg', 0.82); }); })
+          .then(job.res, job.rej).then(function () { BUSY--; pump(); });
+      })(job);
+    }
+  }
+  var io = ('IntersectionObserver' in window) ? new IntersectionObserver(function (ents) {
+    ents.forEach(function (e) { if (e.isIntersecting) { io.unobserve(e.target); showThumb(e.target); } });
+  }, { rootMargin: '300px' }) : null;
+  function showThumb(el) {
+    var url = el.getAttribute('data-pdf');
+    thumb(url).then(function (src) {
+      if (!el.isConnected) return;
+      el.innerHTML = '<img class="pdf-thumb" alt="" src="' + src + '">'; el.classList.add('real');
+    }, function () { /* sin PDF: queda la vista de ejemplo */ });
+  }
+  function renderPdfs() {
+    Array.prototype.forEach.call(app.querySelectorAll('.thumb[data-pdf]'), function (el) {
+      var url = el.getAttribute('data-pdf');
+      if (THUMBS[url]) showThumb(el); else if (io) io.observe(el); else showThumb(el);
+    });
+    var box = app.querySelector('[data-pdf-full]');
+    if (!box) return;
+    var url = box.getAttribute('data-pdf-full'), fb = app.querySelector('.pdf-fallback');
+    function fail() { if (!box.isConnected) return; box.remove(); if (fb) fb.hidden = false; }
+    if (!url) { fail(); return; }
+    openPdf(url).then(function (doc) {
+      var w = Math.min(box.clientWidth || 600, 820), pages = [], chain = Promise.resolve();
+      for (var i = 1; i <= Math.min(doc.numPages, 12); i++) (function (n) {
+        chain = chain.then(function () { return drawPage(doc, n, w); }).then(function (c) { pages.push(c); });
+      })(i);
+      return chain.then(function () {
+        if (!box.isConnected) return;
+        box.innerHTML = '';
+        pages.forEach(function (c, i) { c.className = 'pdf-page'; c.setAttribute('role', 'img'); c.setAttribute('aria-label', 'Página ' + (i + 1) + ' del cifrado'); box.appendChild(c); });
+        closeDoc(doc);
+      });
+    }).catch(function (e) { if (console && console.warn) console.warn("PDF no disponible:", url, e && e.message); fail(); });
+  }
+
   // ---------- eventos ----------
   app.addEventListener('click', function (e) {
     var b = e.target.closest('[data-act]'); if (!b) return;
-    var a = b.getAttribute('data-act'), id = b.getAttribute('data-id');
+    var a = b.getAttribute('data-act');
     if (a === 'scroll') { e.preventDefault(); var t = document.getElementById('buscar'); if (t) t.scrollIntoView({ behavior: 'smooth' }); setTimeout(function () { var q = document.getElementById('q'); if (q) q.focus({ preventScroll: true }); }, 450); return; }
     if (a === 'dark') { S.dark = !S.dark; document.body.classList.toggle('dark', S.dark); store(LS_DARK, S.dark ? '1' : '0'); }
     else if (a === 'top') { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
     else if (a === 'clear') { S.q = ''; }
     else if (a === 'filtro') { S.filtro = b.getAttribute('data-v'); }
     else if (a === 'back') { if (history.length > 1) { history.back(); return; } location.hash = '#/'; return; }
-    else if (a === 'nuevo') { S.draft = blank(); S.err = ''; S.confirm = null; }
-    else if (a === 'cancelar') { S.draft = null; S.err = ''; }
-    else if (a === 'aviso') { S.aviso = ''; }
-    else if (a === 'editar') { var s = DATA.filter(function (x) { return x.id === id; })[0]; if (s) { S.draft = Object.assign({}, s, { bpm: String(s.bpm), paginas: String(s.paginas), _file: '' }); S.err = ''; S.confirm = null; } }
-    else if (a === 'borrar') {
-      if (S.confirm !== id) { S.confirm = id; }
-      else { var gone = DATA.filter(function (x) { return x.id === id; })[0]; DATA = DATA.filter(function (x) { return x.id !== id; }); saveData(); S.confirm = null; if (S.draft && S.draft.id === id) S.draft = null; S.aviso = 'Eliminada: ' + (gone ? gone.titulo : '') + '. Recuerda descargar canciones.js y subirlo a GitHub.'; }
-    }
-    else if (a === 'exportar') { exportData(); return; }
-    else if (a === 'reset') { store(LS_DATA, null); localChanges = false; DATA = BASE.slice(); S.draft = null; S.aviso = 'Se descartaron los cambios locales.'; }
     render();
   });
-  app.addEventListener('input', function (e) {
-    var t = e.target;
-    if (t.id === 'q') { S.q = t.value; render(); return; }
-    var f = t.getAttribute && t.getAttribute('data-f');
-    if (f && S.draft) { S.draft[f] = t.value; if (S.err) { S.err = ''; var er = app.querySelector('.err'); if (er) er.remove(); } }
-  });
-  app.addEventListener('change', function (e) {
-    var t = e.target;
-    if (t.id === 'f-file' && S.draft) {
-      var file = t.files && t.files[0]; if (!file) return;
-      var name = slug(file.name.replace(/\.pdf$/i, '')) + '.pdf';
-      S.draft._file = name; S.draft.pdf = 'pdf/' + name;
-      if (!S.draft.titulo) { var g = file.name.replace(/\.pdf$/i, '').replace(/[-_]+/g, ' ').trim(); S.draft.titulo = g.charAt(0).toUpperCase() + g.slice(1); }
-      render();
-    }
-  });
-  app.addEventListener('submit', function (e) {
-    if (e.target.id !== 'form') return;
-    e.preventDefault();
-    var d = S.draft; if (!d) return;
-    if (!String(d.titulo).trim() || !String(d.artista).trim()) { S.err = 'Escribe el título y el cantante o grupo.'; render(); return; }
-    if (!d.pdf) { S.err = 'Elige el archivo PDF de la canción.'; render(); return; }
-    var clean = {
-      id: d.id || uniqueId(slug(d.titulo)), titulo: String(d.titulo).trim(), artista: String(d.artista).trim(), tono: d.tono,
-      bpm: parseInt(d.bpm, 10) || 0, compas: d.compas, acordes: String(d.acordes || '').trim(), formato: d.formato, nivel: d.nivel,
-      paginas: parseInt(d.paginas, 10) || 1, instrumentos: d.instrumentos, video: String(d.video || '').trim(), pdf: d.pdf
-    };
-    if (d.id) DATA = DATA.map(function (s) { return s.id === d.id ? clean : s; }); else DATA.push(clean);
-    saveData();
-    S.aviso = (d.id ? 'Guardada: ' : 'Agregada: ') + clean.titulo + ' · ' + clean.artista + (d._file ? ' — sube «' + d._file + '» a la carpeta pdf/ en GitHub.' : '');
-    S.draft = null; S.err = '';
-    render();
-  });
-  function uniqueId(base) { var id = base || 'cancion', n = 2; while (DATA.some(function (s) { return s.id === id; })) id = base + '-' + n++; return id; }
-  function exportData() {
-    var txt = '// Lista de canciones del sitio (generado desde el panel de administración).\n' +
-      '// "artista" define la carpeta · "acordes" son los acordes de la canción · "pdf" es la ruta del archivo en la carpeta /pdf · "video" es el enlace de YouTube.\n' +
-      'window.CANCIONES = [\n' + DATA.map(function (s) { return '  ' + JSON.stringify(s); }).join(',\n') + '\n];\n';
-    var blob = new Blob([txt], { type: 'text/javascript' }), url = URL.createObjectURL(blob), a = document.createElement('a');
-    a.href = url; a.download = 'canciones.js'; document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-    S.aviso = 'Descargado canciones.js. Súbelo a la carpeta data/ de tu repositorio en GitHub.'; render();
-  }
+  app.addEventListener('input', function (e) { if (e.target.id === 'q') { S.q = e.target.value; render(); } });
 
-  window.addEventListener('hashchange', function () { if (location.hash === '#buscar' || location.hash === '#canciones') return; S.draft = route().view === 'admin' ? S.draft : null; render(); });
+  window.addEventListener('hashchange', function () { if (location.hash === '#buscar' || location.hash === '#canciones') return; render(); });
   render();
+  load();
   setTimeout(function () { S.intro = false; var h = app.querySelector('header'); if (h) h.classList.remove('intro'); }, 1700);
 })();

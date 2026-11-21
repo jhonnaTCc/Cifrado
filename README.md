@@ -14,54 +14,64 @@ Es un sitio estático (HTML, CSS y JavaScript): no necesita servidor y se public
 ## Estructura
 
 ```
-index.html            Página principal
-css/estilos.css       Diseño (colores, modo oscuro, tipografía)
-js/app.js             Funcionamiento (carpetas, buscador, fichas, panel)
-data/config.js        Tu canal de YouTube, iglesia y correo
-data/canciones.js     Lista de canciones
-pdf/                  Los PDF de los cifrados
+index.html              Página principal
+css/estilos.css         Diseño (colores, modo oscuro, celular)
+js/app.js               Funcionamiento (carpetas, buscador, fichas, vista del PDF)
+js/pdfjs/               pdf.js de Mozilla, para mostrar el contenido de los PDF
+data/canciones.json     Lista de canciones
+data/config.json        Canal de YouTube, iglesia y correo
+pdf/                    Los PDF de los cifrados
+img/portada.jpg         Imagen de la portada
+.pages.yml              Configuración del panel de administración (Pages CMS)
 ```
 
-## Configurar tu canal
+## Panel de administración (Pages CMS)
 
-Edita `data/config.js` y cambia `@tucanal` y el enlace por los de tu canal de YouTube.
-Deja `?sub_confirmation=1` al final del enlace: así YouTube muestra directamente la ventana para suscribirse.
+El panel **no está dentro de la web**: se usa en [app.pagescms.org](https://app.pagescms.org) y solo puede entrar quien tenga acceso a este repositorio con su cuenta de GitHub.
 
-## Agregar o editar canciones
+**Primera vez (una sola vez):**
 
-**Opción A — con el panel (más fácil)**
+1. Entra a <https://app.pagescms.org> y pulsa **Sign in with GitHub**.
+2. Si te lo pide, instala la app de Pages CMS en tu cuenta y dale acceso al repositorio **Cifrado**.
+3. Abre el repositorio **Cifrado**. Verás dos secciones: **Canciones** y **Configuración del sitio**.
 
-1. Abre la web y entra a **Administrar** (al pie de la página, o `#/admin`).
-2. Agrega o edita canciones. Al elegir el PDF, el panel te dice con qué nombre subirlo.
-3. Pulsa **Descargar canciones.js**.
-4. En GitHub: **Add file → Upload files**, sube `canciones.js` dentro de la carpeta `data/` y tus PDF dentro de `pdf/`. Confirma con **Commit changes**.
+**Agregar una canción:**
 
-> El panel guarda los cambios solo en tu navegador hasta que subes `canciones.js` a GitHub. Los visitantes no pueden cambiar nada de tu repositorio.
+1. En **Canciones**, pulsa **Add an entry** (agregar).
+2. Escribe el título y el cantante o grupo (el cantante define la carpeta en la web).
+3. En **Archivo PDF**, sube el PDF del cifrado.
+4. Llena tono, acordes, tempo, compás, nivel y el enlace del video de YouTube.
+5. Pulsa **Save**. En 1–2 minutos aparece en la web, con la vista del PDF.
 
-**Opción B — editando el archivo**
+Para **editar** una canción, ábrela, cambia lo que necesites y guarda. Para **cambiar el PDF**, sube el nuevo en el mismo campo.
 
-Abre `data/canciones.js` en GitHub (ícono del lápiz), copia un bloque `{ ... }`, cambia los datos y guarda.
+En **Configuración del sitio** cambias el nombre y enlace de tu canal de YouTube, la iglesia y el correo.
 
-Campos de cada canción:
+> Funciona también desde el celular: entra a app.pagescms.org en el navegador.
+
+## Vista del PDF
+
+La web muestra el contenido real de cada PDF: la primera página en la tarjeta de la canción y todas las páginas (hasta 12) en su ficha. Si una canción todavía no tiene PDF, se ve una hoja de ejemplo con los acordes.
+
+## Campos de cada canción
 
 | Campo | Ejemplo | Para qué sirve |
 |---|---|---|
-| `id` | `"renuevame"` | Dirección de la ficha (sin tildes ni espacios) |
-| `titulo` | `"Renuévame"` | Nombre de la canción |
+| `titulo` | `"Renuévame"` | Nombre de la canción (también forma la dirección de su ficha) |
 | `artista` | `"Marcos Witt"` | Define la carpeta del cantante o grupo |
+| `pdf` | `"pdf/renuevame.pdf"` | Archivo del cifrado dentro de la carpeta `pdf/` |
 | `tono` | `"G"` | Tonalidad |
+| `acordes` | `"G · C · D · Em"` | Acordes que se usan en la canción |
 | `bpm` | `70` | Tempo |
 | `compas` | `"4/4"` | Compás |
-| `acordes` | `"G · C · D · Em"` | Acordes que se usan en la canción |
 | `formato` | `"Cifrado"` o `"Partitura"` | Tipo de hoja |
 | `nivel` | `"Básico"` | Dificultad |
 | `paginas` | `1` | Páginas del PDF |
 | `instrumentos` | `"Piano"` | Instrumentos |
 | `video` | `"https://youtu.be/XXXXXXXXXXX"` | Video guía (se reproduce dentro de la ficha) |
-| `pdf` | `"pdf/renuevame.pdf"` | Ruta del PDF dentro de la carpeta `pdf/` |
 
-> Las canciones que vienen de ejemplo tienen tonos y tempos de muestra y aún no tienen PDF ni video: reemplázalas por las tuyas.
+> Las canciones que vienen de ejemplo tienen tonos y tempos de muestra y aún no tienen PDF ni video: reemplázalas por las tuyas desde el panel.
 
 ## Imagen de portada
 
-Guarda la imagen como `img/portada.jpg` (horizontal 4:3, mínimo 1600 × 1200 px). Mientras no exista, la portada muestra un recuadro gris.
+Está en `img/portada.jpg` (horizontal 4:3). Para cambiarla, sube otra imagen con el mismo nombre.
