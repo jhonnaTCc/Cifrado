@@ -61,5 +61,17 @@
     "nivel": "Básico",
     "paginas": 2,
     "instrumentos": "Piano"
+  },
+  {
+    "titulo": "Recompensa soy",
+    "artista": "CCINT",
+    "pdf": "pdf/recompensa-soy-ccint-piano.pdf",
+    "tono": "Ab",
+    "bpm": 158,
+    "compas": "4/4",
+    "formato": "Cifrado",
+    "nivel": "Intermedio",
+    "paginas": 2,
+    "instrumentos": "Piano "
   }
 ]
