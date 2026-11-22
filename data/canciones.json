@@ -86,5 +86,17 @@
     "paginas": 1,
     "instrumentos": "Piano",
     "video": "https://youtu.be/DAh_0RzZW7w?si=13lhills-A_eVv18"
+  },
+  {
+    "titulo": "Hossana",
+    "artista": "Marcos Barrientos",
+    "pdf": "pdf/hossana-marcos-barrientos-cifrado.pdf",
+    "tono": "Bm",
+    "bpm": 146,
+    "compas": "4/4",
+    "formato": "Cifrado",
+    "nivel": "Básico",
+    "paginas": 1,
+    "instrumentos": "Piano"
   }
 ]
