@@ -49,5 +49,17 @@
     "paginas": 1,
     "instrumentos": "Piano",
     "video": "https://youtu.be/ry0l3q4pBjc?si=hJvWDpBmmuy18zyd"
+  },
+  {
+    "titulo": "Mi Gozo",
+    "artista": "Barak",
+    "pdf": "pdf/mi-gozo-barak-cifrado.pdf",
+    "tono": "D",
+    "bpm": 140,
+    "compas": "4/4",
+    "formato": "Cifrado",
+    "nivel": "Básico",
+    "paginas": 2,
+    "instrumentos": "Piano"
   }
 ]
