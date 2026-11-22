@@ -73,5 +73,17 @@
     "nivel": "Intermedio",
     "paginas": 2,
     "instrumentos": "Piano "
+  },
+  {
+    "titulo": "Medley Comando Gaf",
+    "artista": "YADHA",
+    "pdf": "pdf/medley-con-todo-mi-corazon-yadha-cifrado.pdf",
+    "tono": "Em",
+    "bpm": 158,
+    "compas": "4/4",
+    "formato": "Cifrado",
+    "nivel": "Intermedio",
+    "paginas": 1,
+    "instrumentos": "Piano"
   }
 ]
