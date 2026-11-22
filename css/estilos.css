@@ -105,12 +105,20 @@ body.dark .hero-img img { filter: invert(.933); }
 @media (max-width: 640px) { .intro { grid-template-columns: 1fr; } }
 
 /* ===== Buscador ===== */
-.search { max-width: 560px; grid-column: 2 / -1; }
+/* Fila de «Carpetas»: título · buscador · cantidad */
+.gal-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr); gap: 22px; align-items: start; scroll-margin-top: 20px; }
+.gal-head .gh-count { text-align: right; }
+.gal-head .search { max-width: 560px; margin-top: -6px; }
+.gal { scroll-margin-top: 20px; }
 .search-bar { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--fg); padding: 4px 0 6px; }
 .search-bar input { flex: 1; min-width: 0; min-height: 34px; border: 0; background: transparent; font-size: 15px; padding: 0; }
 .search-bar input:focus-visible { outline: none; }
+.search-bar input::-webkit-search-cancel-button { -webkit-appearance: none; display: none; }
 .search-bar:focus-within { border-bottom-width: 2px; padding-bottom: 5px; }
-@media (max-width: 640px) { .search { grid-column: auto; } }
+@media (max-width: 640px) {
+  .gal-head { grid-template-columns: 1fr auto; grid-template-areas: 'label count' 'search search'; gap: 16px 12px; }
+  .gal-head .gh-label { grid-area: label; } .gal-head .gh-count { grid-area: count; } .gal-head .search { grid-area: search; max-width: none; margin-top: 0; }
+}
 
 /* ===== Galería de carpetas ===== */
 .gal-title { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin-top: 56px; font-size: clamp(22px, 2.7vw, 42px); line-height: 1; letter-spacing: -0.02em; text-transform: uppercase; }

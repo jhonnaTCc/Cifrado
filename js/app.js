@@ -192,19 +192,16 @@
       '<div class="btns" style="margin-top:30px"><a class="btn btn-solid" href="#buscar" data-act="scroll">Buscar un cifrado ↓</a>' +
       '<a class="btn btn-line" href="' + YT + '" target="_blank" rel="noopener">' + I.play('#D7261E') + 'Suscribirse en YouTube</a></div></div></section>';
 
-    h += '<section id="buscar" class="cols rule" aria-label="Buscar">' +
-      '<div class="small"><div>Buscar</div><div class="muted">Canción, cantante o grupo</div></div>' +
-      '<div class="search"><label for="q" class="sr">Buscar por canción, cantante o grupo</label>' +
-      '<div class="search-bar">' + I.search + '<input id="q" type="search" autocomplete="off" placeholder="Busca por canción, cantante o grupo" value="' + esc(S.q) + '">' +
-      (S.q ? '<button data-act="clear" class="small muted" style="min-height:34px">Limpiar ✕</button>' : '') + '</div>' +
-      '<div class="small muted" style="padding-top:8px" id="sum">' + summary + '</div></div></section>';
-
     // Galería de carpetas
     var act = shownF.filter(function (f) { return f.name === S.activa; })[0] || shownF[0];
     var ai = act ? shownF.indexOf(act) : -1;
-    h += '<section class="sec gal" aria-label="Cantantes y agrupaciones">' +
-      '<div class="between rule small"><div><div>Carpetas</div><div class="muted">Cantantes y agrupaciones</div></div>' +
-      '<div style="text-align:right"><div>' + plural(shownF.length, 'carpeta', 'carpetas') + '</div><div class="muted hint-desk">Pasa el cursor y abre una</div></div></div>' +
+    h += '<section id="buscar" class="sec gal" aria-label="Cantantes y agrupaciones">' +
+      '<div class="gal-head rule small"><div class="gh-label"><div>Carpetas</div><div class="muted">Cantantes y agrupaciones</div></div>' +
+      '<div class="search" role="search"><label for="q" class="sr">Buscar por canción, cantante o grupo</label>' +
+        '<div class="search-bar">' + I.search + '<input id="q" type="search" autocomplete="off" placeholder="Busca por canción, cantante o grupo" value="' + esc(S.q) + '">' +
+        (S.q ? '<button data-act="clear" class="small muted" style="min-height:34px">Limpiar ✕</button>' : '') + '</div>' +
+        '<div class="small muted" style="padding-top:8px" id="sum">' + summary + '</div></div>' +
+      '<div class="gh-count"><div>' + plural(shownF.length, 'carpeta', 'carpetas') + '</div><div class="muted hint-desk">Pasa el cursor y abre una</div></div></div>' +
       '<div class="gal-title"><div><div>Cantantes</div><div class="l2"><span class="squares" aria-hidden="true"><i></i><i></i><i></i></span><span>y grupos</span><sup>Nº ' + pad(shownF.length) + '</sup><span class="slash">/.</span></div></div>' +
       '<div class="act"><span id="act-name">' + esc(act ? act.name.toUpperCase() : '') + '</span><sup id="act-pos">' + (act ? (ai + 1) + ' / ' + shownF.length : '') + '</sup></div></div>' +
       '<div class="gal-desc small muted"><div>Cada carpeta reúne los cifrados y partituras de un mismo cantante o grupo.</div><div id="act-desc">' + (act ? plural(act.count, 'canción', 'canciones') + ' · Tonos ' + esc(act.keys) : '') + '</div></div>' +
