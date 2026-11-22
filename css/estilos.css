@@ -5,11 +5,15 @@
   --inv: #151515; --invfg: #f2f2f2; --invmuted: #a3a3a3; --invline: #333333;
   --red: #D7261E; --err: #B3261E;
   --mono: 'JetBrains Mono', ui-monospace, monospace;
+  --float: 0 1px 2px rgba(0,0,0,.06), 0 6px 12px -2px rgba(0,0,0,.08), 0 18px 36px -8px rgba(0,0,0,.18);
+  --float-hover: 0 2px 4px rgba(0,0,0,.06), 0 12px 20px -4px rgba(0,0,0,.10), 0 30px 54px -10px rgba(0,0,0,.26);
 }
 body.dark {
   --bg: #111111; --fg: #ededed; --muted: #9a9a9a; --ghost: #3a3a3a;
   --line: #2a2a2a; --line2: #4a4a4a; --card: #1b1b1b; --card2: #242424;
   --inv: #ededed; --invfg: #111111; --invmuted: #5c5c5c; --invline: #c9c9c9;
+  --float: 0 1px 2px rgba(0,0,0,.5), 0 8px 16px -2px rgba(0,0,0,.5), 0 22px 40px -8px rgba(0,0,0,.7);
+  --float-hover: 0 2px 4px rgba(0,0,0,.5), 0 14px 24px -4px rgba(0,0,0,.55), 0 34px 60px -10px rgba(0,0,0,.8);
 }
 
 /* ===== Base ===== */
@@ -164,12 +168,12 @@ body.dark .hero-img img { filter: invert(.933); }
 .card:hover { opacity: 1; }
 .card .head { display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid var(--line); padding: 8px 0 12px; }
 .card .thumb { background: var(--card); aspect-ratio: 1 / 1.06; display: flex; align-items: center; justify-content: center; transition: background .35s; }
-.card:hover .thumb .sheet { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,.10); }
+.card:hover .thumb .sheet { transform: translateY(-8px); box-shadow: var(--float-hover); }
 
 /* Hoja (vista previa del PDF) */
-.sheet { background: #fff; color: #111; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,.08); transition: transform .3s, box-shadow .3s; }
+.sheet { background: #fff; color: #111; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--float); transform: translateY(-2px); transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s; }
 .sheet.sm { width: 66%; aspect-ratio: 1 / 1.3; padding: 9%; gap: 5px; }
-.sheet.lg { width: 74%; max-width: 560px; aspect-ratio: 1 / 1.32; padding: 8%; gap: 9px; box-shadow: 0 2px 6px rgba(0,0,0,.08); }
+.sheet.lg { width: 74%; max-width: 560px; aspect-ratio: 1 / 1.32; padding: 8%; gap: 9px; box-shadow: var(--float); }
 .sheet .t { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; font-weight: 600; letter-spacing: -0.01em; }
 .sheet.sm .t { font-size: 9px; } .sheet.lg .t { font-size: clamp(16px, 1.7vw, 24px); letter-spacing: -0.02em; }
 .sheet .t span { font-family: var(--mono); font-weight: 400; color: #666; }
@@ -220,10 +224,10 @@ body.dark .hero-img img { filter: invert(.933); }
 .chan { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 
 /* ===== PDF real (miniaturas y páginas) ===== */
-.thumb .pdf-thumb { display: block; width: 66%; height: auto; box-shadow: 0 1px 3px rgba(0,0,0,.12); background: #fff; transition: transform .3s, box-shadow .3s; animation: fade .4s ease; }
-.card:hover .thumb .pdf-thumb { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,.12); }
+.thumb .pdf-thumb { display: block; width: 66%; height: auto; box-shadow: var(--float); background: #fff; transform: translateY(-2px); transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s; animation: fade .4s ease; }
+.card:hover .thumb .pdf-thumb { transform: translateY(-8px); box-shadow: var(--float-hover); }
 .pdf-pages { width: 86%; max-width: 820px; display: flex; flex-direction: column; gap: 14px; }
-.pdf-page { display: block; width: 100%; height: auto; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.10); }
+.pdf-page { display: block; width: 100%; height: auto; background: #fff; box-shadow: var(--float); }
 .pdf-loading { padding: 80px 0; text-align: center; }
 .pdf-fallback { width: 100%; display: flex; flex-direction: column; align-items: center; }
 .pdf-fallback[hidden] { display: none; }
